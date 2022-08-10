@@ -2,6 +2,7 @@
 
 using EFCoreTest;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 OrgUnit parent = new OrgUnit()
 {
@@ -107,20 +108,25 @@ using (TestDbContext dbContext = new TestDbContext())
     // dbContext.Leaves.Add(leave);
     // await dbContext.SaveChangesAsync();
 
-    
-    
-    
 
-    
-    dbContext.OrgUnits.Add(parent);
-    dbContext.OrgUnits.Add(child1);
-    
-    dbContext.OrgUnits.Add(child11);
-    dbContext.OrgUnits.Add(child12);
-    
-    dbContext.OrgUnits.Add(child2);
-    dbContext.OrgUnits.Add(child21);
-    dbContext.OrgUnits.Add(child22);
-    dbContext.SaveChanges();
+
+
+
+
+    //dbContext.OrgUnits.Add(parent);
+    //dbContext.OrgUnits.Add(child1);
+
+    //dbContext.OrgUnits.Add(child11);
+    //dbContext.OrgUnits.Add(child12);
+
+    //dbContext.OrgUnits.Add(child2);
+    //dbContext.OrgUnits.Add(child21);
+    //dbContext.OrgUnits.Add(child22);
+    //dbContext.SaveChanges();
+
+    var a = dbContext.OrgUnits.Where(x => x.Parent == null).FirstOrDefault();
+    Console.OutputEncoding = Encoding.GetEncoding(936);
+    Console.WriteLine(a.Name);
+    Method.PrintChildren(1, dbContext, a);
 
 }

@@ -3,6 +3,7 @@ using System;
 using EFCoreTest;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -11,15 +12,17 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EFCoreTest.Migrations
 {
     [DbContext(typeof(TestDbContext))]
-    [Migration("20220809131500_AddUsers")]
-    partial class AddUsers
+    [Migration("20220810150919_initSqlServer")]
+    partial class initSqlServer
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.7")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("ProductVersion", "6.0.8")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
             modelBuilder.Entity("EFCoreTest.Article", b =>
                 {
@@ -27,13 +30,15 @@ namespace EFCoreTest.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -46,17 +51,19 @@ namespace EFCoreTest.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
                     b.Property<double>("Price")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("double")
+                        .HasColumnType("float")
                         .HasDefaultValue(23.0);
 
                     b.Property<DateTime>("PubTime")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -69,16 +76,18 @@ namespace EFCoreTest.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
                     b.Property<long>("ArticleId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -93,14 +102,16 @@ namespace EFCoreTest.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    b.Property<long>("ApproverId")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<long?>("ApproverId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("RequesterId")
+                    b.Property<long?>("RequesterId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("Time")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -111,21 +122,46 @@ namespace EFCoreTest.Migrations
                     b.ToTable("T_Leaves", (string)null);
                 });
 
+            modelBuilder.Entity("EFCoreTest.OrgUnit", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("ParentId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("T_OrgUnits", (string)null);
+                });
+
             modelBuilder.Entity("EFCoreTest.Person", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
                     b.Property<int>("Age")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("BrithDay")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -138,9 +174,11 @@ namespace EFCoreTest.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -162,24 +200,34 @@ namespace EFCoreTest.Migrations
                 {
                     b.HasOne("EFCoreTest.User", "Approver")
                         .WithMany()
-                        .HasForeignKey("ApproverId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ApproverId");
 
                     b.HasOne("EFCoreTest.User", "Requester")
                         .WithMany()
-                        .HasForeignKey("RequesterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RequesterId");
 
                     b.Navigation("Approver");
 
                     b.Navigation("Requester");
                 });
 
+            modelBuilder.Entity("EFCoreTest.OrgUnit", b =>
+                {
+                    b.HasOne("EFCoreTest.OrgUnit", "Parent")
+                        .WithMany("Childern")
+                        .HasForeignKey("ParentId");
+
+                    b.Navigation("Parent");
+                });
+
             modelBuilder.Entity("EFCoreTest.Article", b =>
                 {
                     b.Navigation("Commonts");
+                });
+
+            modelBuilder.Entity("EFCoreTest.OrgUnit", b =>
+                {
+                    b.Navigation("Childern");
                 });
 #pragma warning restore 612, 618
         }

@@ -8,7 +8,7 @@ public class OrgUnitConfig : IEntityTypeConfiguration<OrgUnit>
     public void Configure(EntityTypeBuilder<OrgUnit> builder)
     {
         builder.ToTable("T_OrgUnits");
-        builder.HasOne<OrgUnit>(x => x.Parent).WithMany(x => x.Childern);
+        object p = builder.HasOne<OrgUnit>(x => x.Parent).WithMany(x => x.Childern);
         builder.Property(x => x.Name).IsUnicode().IsRequired();
     }
 }
